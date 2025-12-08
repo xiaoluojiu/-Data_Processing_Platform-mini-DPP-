@@ -34,6 +34,7 @@ from .降维.主成分分析 import fit as fit_pca
 
 # 关联规则
 from .关联规则.Apriori关联规则 import fit as fit_apriori
+from .关联规则.FPGrowth关联规则 import fit as fit_fpgrowth
 
 # 模型解释
 from .模型解释.SHAP解释器 import explain as explain_shap
@@ -68,6 +69,7 @@ __all__ = [
     'fit_pca',
     # 关联规则
     'fit_apriori',
+    'fit_fpgrowth',
     # 模型解释
     'explain_shap',
     # 工具函数

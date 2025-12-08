@@ -30,6 +30,7 @@ from 算法.降维.主成分分析 import fit as fit_pca
 
 # 导入关联规则算法
 from 算法.关联规则.Apriori关联规则 import fit as fit_apriori
+from 算法.关联规则.FPGrowth关联规则 import fit as fit_fpgrowth
 
 # 导入模型解释算法
 from 算法.模型解释.SHAP解释器 import explain as explain_with_shap
@@ -184,6 +185,27 @@ def perform_apriori(df, min_support=0.1, min_confidence=0.5):
         包含频繁项集和关联规则的字典
     """
     return fit_apriori(df, min_support=min_support, min_confidence=min_confidence)
+
+
+def perform_fpgrowth(df, min_support=0.1, min_confidence=0.5):
+    """
+    执行FP-Growth关联规则挖掘（统一接口）
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        事务数据（每行是一个事务，每列是一个项）
+    min_support : float
+        最小支持度
+    min_confidence : float
+        最小置信度
+    
+    Returns:
+    --------
+    dict
+        包含频繁项集和关联规则的字典
+    """
+    return fit_fpgrowth(df, min_support=min_support, min_confidence=min_confidence)
 
 
 # ==================== 模型解释 ====================

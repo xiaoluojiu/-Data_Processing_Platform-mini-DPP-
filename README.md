@@ -1,68 +1,82 @@
-# 📊 交互式数据分析平台
+# 📊 Interactive Data Analysis Platform
 
-基于 **Streamlit** 的现代化数据分析平台，支持数据上传、探索性分析、机器学习、聚类分析和关联规则挖掘。
+<div align="center">
 
-## ✨ 功能特性
+![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-### 📤 数据管理
-- 支持多种数据格式：CSV、Excel (.xlsx, .xls)、JSON
-- 智能数据解析（自动检测分隔符和编码）
-- 数据质量评估（完整性、唯一性、一致性评分）
-- 交互式数据清洗（缺失值处理、重复值删除、异常值检测）
+**A modern, interactive data analysis platform built with Streamlit**
 
-### 🔍 探索性数据分析 (EDA)
-- **单变量分析**：直方图、箱线图、小提琴图、条形图
-- **双变量分析**：散点图、密度等高线图
-- **多变量分析**：散点矩阵、平行坐标图
-- **相关性分析**：热力图可视化
+[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
-### 🤖 机器学习
-- **回归算法**：线性回归、K近邻回归、决策树回归
-- **分类算法**：逻辑回归、朴素贝叶斯、K近邻分类、决策树分类（支持CART/ID3/C4.5）
-- **自动参数优化**：智能超参数搜索
-- **模型评估**：多种评估指标和可视化
-- **模型解释**：特征重要性、SHAP值分析
+</div>
 
-### 📊 聚类分析
-- **K-means聚类**：支持最优K值查找（肘部法则+轮廓系数）
-- **DBSCAN聚类**：基于密度的聚类算法
-- **性能优化**：大数据集自动采样，避免卡顿
-- **可视化**：散点分布图、轮廓系数分析图
+---
 
-### 📉 降维分析
-- **主成分分析 (PCA)**：方差解释率可视化、2D投影图
+## 🌟 Overview
 
-### 🔗 关联规则挖掘
-- **Apriori算法**：频繁项集和关联规则挖掘
-- **可视化**：规则热力图、桑基图（Sankey Diagram）
+An all-in-one data analysis platform that seamlessly integrates data loading, preprocessing, exploratory analysis, machine learning, clustering, and association rule mining. Built with a focus on user experience and powerful analytics capabilities.
 
-## 🚀 快速开始
+![Platform Demo](https://via.placeholder.com/800x400/3b82f6/ffffff?text=Data+Analysis+Platform)
 
-### 环境要求
+## ✨ Features
+
+### 📤 Data Management
+- **Multi-format Support**: CSV, Excel (.xlsx, .xls), JSON
+- **Smart Parsing**: Automatic delimiter and encoding detection
+- **Quality Assessment**: Completeness, uniqueness, and consistency scoring
+- **Interactive Cleaning**: Handle missing values, duplicates, and outliers
+
+### 🔍 Exploratory Data Analysis (EDA)
+- **Univariate Analysis**: Histograms, box plots, violin plots, bar charts
+- **Bivariate Analysis**: Scatter plots, density contour plots
+- **Multivariate Analysis**: Scatter matrix, parallel coordinates
+- **Correlation Analysis**: Heatmap visualization
+
+### 🤖 Machine Learning
+- **Regression**: Linear Regression, KNN Regression, Decision Tree Regression
+- **Classification**: Logistic Regression, Naive Bayes, KNN, Decision Trees (CART/ID3/C4.5)
+- **Auto Optimization**: Intelligent hyperparameter search
+- **Model Evaluation**: Comprehensive metrics and visualizations
+- **Model Interpretation**: Feature importance, SHAP value analysis
+
+### 📊 Clustering Analysis
+- **K-means Clustering**: Optimal K value detection (Elbow method + Silhouette score)
+- **DBSCAN Clustering**: Density-based clustering algorithm
+- **Performance Optimized**: Automatic sampling for large datasets
+- **Rich Visualizations**: Scatter plots, silhouette analysis
+
+### 📉 Dimensionality Reduction
+- **PCA (Principal Component Analysis)**: Variance explanation visualization, 2D projection
+
+### 🔗 Association Rule Mining
+- **Apriori Algorithm**: Classic algorithm for frequent itemset mining
+- **FP-Growth Algorithm**: Efficient algorithm using FP-tree structure (faster for large datasets)
+- **Visualizations**: Rule heatmap, Sankey diagram
+
+## 🚀 Quick Start
+
+### Prerequisites
+
 - Python 3.9+
-- Conda（推荐）或 pip
+- Conda (recommended) or pip
 
-### 安装步骤
+### Installation
 
-1. **克隆仓库**
 ```bash
+# 1. Clone the repository
 git clone <your-repo-url>
 cd 数据挖掘
-```
 
-2. **创建Conda环境（推荐）**
-```bash
-conda create -n lxt python=3.9
-conda activate lxt
-```
+# 2. Create Conda environment (recommended)
+conda create -n data-analysis python=3.9
+conda activate data-analysis
 
-3. **安装依赖**
-```bash
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-4. **启动应用**
-```bash
+# 4. Run the application
 # Windows
 run.bat
 
@@ -70,150 +84,156 @@ run.bat
 streamlit run main.py
 ```
 
-应用将在浏览器中自动打开，默认地址：`http://localhost:8501`
+The application will automatically open in your browser at `http://localhost:8501`
 
-### 生成测试数据（可选）
+### Generate Sample Data (Optional)
+
 ```bash
 python generate_datasets.py
 ```
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 .
-├── main.py                    # Streamlit主应用
-├── data_loader.py            # 数据加载与预处理
-├── visualization.py           # 数据可视化
-├── ml_models.py              # 机器学习统一接口
-├── ml_visualization.py        # ML可视化
-├── generate_datasets.py      # 生成测试数据集脚本
-├── page_modules/             # 页面模块
-│   ├── data_pages.py        # 数据相关页面
-│   └── ml_pages.py          # 机器学习页面
-├── utils/                     # 工具模块
-│   └── config.py            # 配置和样式
-├── 算法/                      # 算法实现（模块化）
-│   ├── utils.py             # 算法公共工具
-│   ├── 数据准备.py
-│   ├── 回归/
-│   │   ├── 线性回归.py
-│   │   ├── K近邻回归.py
-│   │   └── 决策树回归.py
-│   ├── 分类/
-│   │   ├── 逻辑回归.py
-│   │   ├── 朴素贝叶斯.py
-│   │   ├── K近邻分类.py
-│   │   └── 决策树分类.py
-│   ├── 聚类/
-│   │   ├── K均值聚类.py
-│   │   └── DBSCAN聚类.py
-│   ├── 降维/
-│   │   └── 主成分分析.py
-│   ├── 关联规则/
-│   │   └── Apriori关联规则.py
-│   └── 模型解释/
-│       └── SHAP解释器.py
-├── data/                     # 测试数据集（运行generate_datasets.py生成）
-├── background.jpg            # 背景图片（可选）
-├── requirements.txt          # 依赖列表
-├── environment.yml           # Conda环境配置（可选）
-└── run.bat                   # Windows启动脚本
+├── main.py                    # Streamlit main application
+├── data_loader.py            # Data loading and preprocessing
+├── visualization.py           # Data visualization (EDA)
+├── ml_models.py              # ML unified interface
+├── ml_visualization.py       # ML visualizations
+├── generate_datasets.py      # Generate sample datasets
+├── page_modules/             # Page modules
+│   ├── data_pages.py        # Data-related pages
+│   └── ml_pages.py          # Machine learning pages
+├── utils/                     # Utility modules
+│   └── config.py            # Configuration and styles
+├── 算法/                      # Algorithm implementations (modularized)
+│   ├── utils.py             # Common algorithm utilities
+│   ├── 数据准备.py           # Data preparation
+│   ├── 回归/                 # Regression algorithms
+│   ├── 分类/                 # Classification algorithms
+│   ├── 聚类/                 # Clustering algorithms
+│   ├── 降维/                 # Dimensionality reduction
+│   ├── 关联规则/             # Association rules
+│   └── 模型解释/             # Model interpretation
+├── data/                     # Sample datasets (auto-generated)
+├── background.jpg            # Background image (optional)
+├── requirements.txt          # Dependencies
+├── environment.yml           # Conda environment config
+└── run.bat                   # Windows launcher
 ```
 
-## 🎨 界面特色
+## 🎨 Interface Highlights
 
-- **现代化UI设计**：渐变标题、卡片式布局、半透明背景
-- **背景图片支持**：使用 `background.jpg` 作为应用背景（可选）
-- **响应式布局**：自适应不同屏幕尺寸
-- **交互式图表**：基于 Plotly 的交互式可视化
+- **Modern UI Design**: Gradient headers, card-based layout, elegant styling
+- **Background Support**: Customizable background images
+- **Responsive Layout**: Adapts to different screen sizes
+- **Interactive Charts**: Plotly-based interactive visualizations
 
-## 📚 使用指南
+## 📚 Usage Guide
 
-### 1. 数据上传
-- 支持拖拽上传或点击选择文件
-- CSV文件可自定义分隔符（逗号、分号、制表符）
-- 自动检测文件编码
+### 1. Data Upload
+Upload your data files via drag-and-drop or file selection. Supports CSV with custom delimiters and automatic encoding detection.
 
-### 2. 数据概览
-- 查看数据基本信息（行数、列数、内存占用）
-- 查看列详细信息（类型、缺失值统计）
-- 查看数据质量评分
+### 2. Data Overview
+View data statistics, column information, and quality scores at a glance.
 
-### 3. 数据清洗
-- 缺失值处理：保留/删除/填充（均值/中位数/众数）
-- 重复值处理：删除重复行
-- 异常值处理：Z-score方法或IQR方法
+### 3. Data Cleaning
+- **Missing Values**: Keep, remove, or fill (mean/median/mode)
+- **Duplicates**: Remove duplicate rows
+- **Outliers**: Detect using Z-score or IQR method
 
-### 4. 探索性分析
-- 选择不同的图表类型进行数据探索
-- 支持单变量、双变量、多变量分析
-- 自动推荐合适的图表类型
+### 4. Exploratory Analysis
+Choose from various chart types for comprehensive data exploration across univariate, bivariate, and multivariate analysis.
 
-### 5. 机器学习
-- 选择任务类型（分类/回归）
-- 选择目标变量和特征
-- 选择模型算法
-- 可选自动参数优化
-- 查看模型评估结果和可视化
+### 5. Machine Learning
+Select task type (classification/regression), choose target and features, pick algorithms, enable auto-optimization, and view results with rich visualizations.
 
-### 6. 聚类分析
-- 选择聚类算法（K-means/DBSCAN）
-- 可查找最优K值
-- 查看聚类结果和轮廓系数
+### 6. Clustering Analysis
+Choose between K-means or DBSCAN, find optimal K values, and visualize clustering results with silhouette analysis.
 
-## 🔧 技术栈
+## 🔧 Tech Stack
 
-- **前端框架**：Streamlit
-- **数据处理**：Pandas, NumPy
-- **机器学习**：Scikit-learn
-- **可视化**：Plotly, Plotly Express
-- **关联规则**：MLxtend
-- **模型解释**：SHAP
-- **UI组件**：streamlit-option-menu
+| Category | Technology |
+|----------|-----------|
+| Frontend | Streamlit |
+| Data Processing | Pandas, NumPy |
+| Machine Learning | Scikit-learn |
+| Visualization | Plotly, Plotly Express |
+| Association Rules | MLxtend |
+| Model Interpretation | SHAP |
+| UI Components | streamlit-option-menu |
 
-## 📝 依赖列表
+## 📝 Dependencies
 
-主要依赖包见 `requirements.txt`：
-- streamlit>=1.28.0
-- pandas>=2.0.0
-- numpy>=1.24.0
-- plotly>=5.17.0
-- scikit-learn>=1.3.0
-- mlxtend>=0.22.0
-- shap>=0.42.0
-- streamlit-option-menu>=0.3.6
+Key dependencies (see `requirements.txt` for complete list):
 
-## 🎯 算法说明
+```
+streamlit>=1.28.0
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.17.0
+scikit-learn>=1.3.0
+mlxtend>=0.22.0
+shap>=0.42.0
+streamlit-option-menu>=0.3.6
+```
 
-所有算法实现已模块化拆分到 `算法/` 目录下，每个算法独立文件，便于维护和扩展。
+## 🎯 Algorithms
 
-### 回归算法
-- **线性回归**：基于最小二乘法
-- **K近邻回归**：基于距离的回归
-- **决策树回归**：基于CART算法
+All algorithms are modularized in the `算法/` directory for easy maintenance and extension.
 
-### 分类算法
-- **逻辑回归**：基于最大似然估计
-- **朴素贝叶斯**：基于贝叶斯定理
-- **K近邻分类**：基于距离的分类
-- **决策树分类**：支持CART/ID3/C4.5算法
+### Regression
+- **Linear Regression**: Least squares method
+- **KNN Regression**: Distance-based regression
+- **Decision Tree Regression**: CART algorithm
 
-### 聚类算法
-- **K-means**：划分聚类，支持最优K值查找
-- **DBSCAN**：基于密度的聚类
+### Classification
+- **Logistic Regression**: Maximum likelihood estimation
+- **Naive Bayes**: Bayesian theorem-based
+- **KNN Classification**: Distance-based classification
+- **Decision Tree Classification**: Supports CART/ID3/C4.5
 
-## 📄 许可证
+### Clustering
+- **K-means**: Partition-based clustering with optimal K detection
+- **DBSCAN**: Density-based clustering
 
-MIT License
+### Association Rules
+- **Apriori**: Classic frequent pattern mining
+- **FP-Growth**: Efficient FP-tree based mining (recommended for large datasets)
 
-## 🙏 致谢
+## 🤝 Contributing
 
-感谢所有开源库的贡献者，特别是 Streamlit、Scikit-learn、Plotly 等优秀的开源项目。
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📮 贡献
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-欢迎提交 Issue 和 Pull Request！
+## 📄 License
 
-## 🐛 问题反馈
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-如遇到问题，请在 GitHub Issues 中反馈。
+## 🙏 Acknowledgments
+
+Special thanks to the open-source community:
+- [Streamlit](https://streamlit.io/) - The framework that makes it all possible
+- [Scikit-learn](https://scikit-learn.org/) - Machine learning algorithms
+- [Plotly](https://plotly.com/) - Interactive visualizations
+- And all other contributors to the libraries we use
+
+## 🐛 Issues
+
+Found a bug or have a feature request? Please [open an issue](https://github.com/yourusername/repo/issues).
+
+---
+
+<div align="center">
+
+**⭐ If you find this project helpful, please give it a star! ⭐**
+
+Made with ❤️ by the Data Analysis Team
+
+</div>

@@ -16,7 +16,7 @@ from ml_models import (
     prepare_data_for_ml, train_regression_model, 
     train_classification_model, perform_kmeans_clustering,
     find_optimal_k, perform_dbscan_clustering,
-    perform_pca, perform_apriori
+    perform_pca, perform_apriori, perform_fpgrowth
 )
 from ml_visualization import (
     plot_confusion_matrix_heatmap, plot_roc_curve,
@@ -751,22 +751,33 @@ def _show_ml_rules(df):
     col_settings, col_results = st.columns([1, 3], gap="large")
     
     with col_settings:
-        st.markdown("#### ⚙️ Apriori 配置")
+        st.markdown("#### ⚙️ 关联规则配置")
+        
+        algorithm = st.selectbox("算法选择", ["Apriori", "FP-Growth"], 
+                                help="Apriori: 经典算法，逐层生成候选集\nFP-Growth: 高效算法，使用FP-tree结构")
+        
+        st.markdown(f"**当前算法**: {algorithm}")
+        if algorithm == "FP-Growth":
+            st.info("💡 FP-Growth 算法比 Apriori 更高效，适合大数据集")
+        
         min_sup = st.slider("最小支持度", 0.01, 0.5, 0.05, 0.01)
         min_conf = st.slider("最小置信度", 0.1, 1.0, 0.5, 0.1)
         run_rules = st.button("🚀 挖掘规则", type="primary", use_container_width=True)
 
     with col_results:
         if run_rules:
-            with st.spinner("挖掘中..."):
+            with st.spinner(f"使用 {algorithm} 算法挖掘中..."):
                 try:
-                    res = perform_apriori(df, min_sup, min_conf)
+                    if algorithm == "Apriori":
+                        res = perform_apriori(df, min_sup, min_conf)
+                    else:
+                        res = perform_fpgrowth(df, min_sup, min_conf)
+                    
                     rules = res['rules']
                     
-                    # 保存关联规则配置
                     rules_config = {
                         'task_type': '关联规则',
-                        'algorithm': 'Apriori',
+                        'algorithm': res.get('algorithm', algorithm),
                         'min_support': min_sup,
                         'min_confidence': min_conf,
                         'n_rules': len(rules) if not rules.empty else 0
@@ -774,7 +785,7 @@ def _show_ml_rules(df):
                     st.session_state.ml_train_config = rules_config
                     
                     if not rules.empty:
-                        st.success(f"找到 {len(rules)} 条规则")
+                        st.success(f"✅ 使用 {algorithm} 算法找到 {len(rules)} 条规则")
                         
                         tab1, tab2, tab3 = st.tabs(["规则列表", "热力图", "桑基图"])
                         generated_charts = {}
