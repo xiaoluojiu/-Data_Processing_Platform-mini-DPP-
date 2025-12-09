@@ -121,8 +121,6 @@ def show_data_overview():
     
     if ('df_metadata' not in st.session_state or 
         st.session_state.get('df_metadata_id') != df_id):
-    if ('df_metadata' not in st.session_state or 
-        st.session_state.get('df_metadata_id') != df_id):
         st.session_state.df_metadata = {
             'shape': df.shape,
             'memory_mb': df.memory_usage(deep=True).sum() / 1024**2
