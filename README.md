@@ -66,7 +66,7 @@ An all-in-one data analysis platform that seamlessly integrates data loading, pr
 
 ```bash
 # 1. Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/xiaoluojiu/-Data_Processing_Platform-mini-DPP-.git
 cd 数据挖掘
 
 # 2. Create Conda environment (recommended)
@@ -238,7 +238,7 @@ Special thanks to the open-source community:
 
 ## 🐛 Issues
 
-Found a bug or have a feature request? Please [open an issue](https://github.com/yourusername/repo/issues).
+Found a bug or have a feature request? Please [open an issue](https://github.com/xiaoluojiu/-Data_Processing_Platform-mini-DPP-/issues).
 
 ---
 
