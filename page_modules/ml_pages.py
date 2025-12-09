@@ -10,6 +10,7 @@ import plotly.express as px
 from streamlit_option_menu import option_menu
 from sklearn.model_selection import train_test_split
 from collections import Counter
+from utils import get_cached_df_operation
 
 # 导入机器学习模块
 from ml_models import (
@@ -69,7 +70,8 @@ def _show_ml_supervised(df, task_type):
     
     with col_settings:
         st.markdown("#### ⚙️ 模型配置")
-        target_col = st.selectbox("目标变量", df.columns.tolist(), key='ml_target')
+        df_columns = get_cached_df_operation(df, 'columns_list')
+        target_col = st.selectbox("目标变量", df_columns, key='ml_target')
         
         if not target_col:
             return
@@ -84,7 +86,7 @@ def _show_ml_supervised(df, task_type):
             st.info(f"💡 检测到目标变量特性，建议使用【{suggested}】任务")
 
         # 特征选择
-        available_features = [c for c in df.columns if c != target_col]
+        available_features = [c for c in df_columns if c != target_col]
         use_all_features = st.checkbox("使用所有特征", value=True)
         if use_all_features:
             selected_features = available_features
@@ -402,7 +404,7 @@ def _show_ml_clustering(df):
     """聚类分析子页面"""
     col_settings, col_results = st.columns([1, 3], gap="large")
     
-    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    numeric_cols = get_cached_df_operation(df, 'select_dtypes_numeric')
     if len(numeric_cols) < 2:
         st.error("聚类需要至少 2 个数值型特征")
         return
@@ -679,7 +681,7 @@ def _show_ml_clustering(df):
 def _show_ml_pca(df):
     """降维分析子页面"""
     col_settings, col_results = st.columns([1, 3], gap="large")
-    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    numeric_cols = get_cached_df_operation(df, 'select_dtypes_numeric')
     
     with col_settings:
         st.markdown("#### ⚙️ PCA 配置")

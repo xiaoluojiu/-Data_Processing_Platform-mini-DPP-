@@ -106,7 +106,9 @@ python generate_datasets.py
 │   ├── data_pages.py        # Data-related pages
 │   └── ml_pages.py          # Machine learning pages
 ├── utils/                     # Utility modules
-│   └── config.py            # Configuration and styles
+│   └── config.py            # Configuration, styles, and caching utilities
+├── .streamlit/               # Streamlit configuration
+│   └── config.toml          # Performance and server settings
 ├── 算法/                      # Algorithm implementations (modularized)
 │   ├── utils.py             # Common algorithm utilities
 │   ├── 数据准备.py           # Data preparation
@@ -129,6 +131,16 @@ python generate_datasets.py
 - **Background Support**: Customizable background images
 - **Responsive Layout**: Adapts to different screen sizes
 - **Interactive Charts**: Plotly-based interactive visualizations
+
+## ⚡ Performance Optimizations
+
+The platform includes comprehensive performance optimizations for smooth user experience:
+
+- **Smart Caching**: DataFrame operations (head, describe, columns) are cached to avoid redundant calculations
+- **Lazy Loading**: Charts are generated only when needed, reducing initial load time
+- **CSS Optimization**: Static background with GPU acceleration for faster rendering
+- **Component State Management**: Menu and component states are preserved across page switches
+- **Streamlit Configuration**: Optimized server settings for faster reruns
 
 ## 📚 Usage Guide
 

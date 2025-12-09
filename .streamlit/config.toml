@@ -1,0 +1,33 @@
+[server]
+# 优化：减少不必要的文件监控
+runOnSave = true
+# 优化：设置合理的上传大小限制
+maxUploadSize = 200
+# 优化：启用文件监控优化
+fileWatcherType = "auto"
+
+[browser]
+# 优化：禁用使用统计收集，减少开销
+gatherUsageStats = false
+# 优化：自动打开浏览器（可选）
+serverAddress = "localhost"
+serverPort = 8501
+
+[theme]
+# 保持主题设置
+primaryColor = "#3b82f6"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[client]
+# 优化：减少不必要的重试
+showErrorDetails = true
+
+[runner]
+# 优化：启用快速重运行
+fastReruns = true
+# 优化：魔术命令优化
+magicEnabled = true
+

@@ -2,25 +2,39 @@
 配置和样式工具
 """
 import streamlit as st
+import pandas as pd
+
+
+def get_plotly_config():
+    """获取Plotly图表渲染配置"""
+    return {
+        'displayModeBar': True,
+        'displaylogo': False,
+        'modeBarButtonsToRemove': ['lasso2d', 'select2d', 'autoScale2d', 'resetScale2d'],
+        'toImageButtonOptions': {
+            'format': 'png',
+            'filename': 'chart',
+            'height': 500,
+            'width': 800,
+            'scale': 1
+        },
+        'responsive': True,
+        'staticPlot': False
+    }
 
 
 def get_custom_css():
     """获取自定义CSS样式"""
     return """
     <style>
-    /* 全局字体和背景 - 柔和的蓝绿色渐变 */
     .stApp {
         background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 25%, #7dd3fc 50%, #38bdf8 75%, #0ea5e9 100%);
-        background-size: 400% 400%;
-        animation: gradient 20s ease infinite;
+        background-attachment: fixed;
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
-    }
-    
-    @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        will-change: auto;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
     
     /* 主内容区域 - 使用纯白背景，不再需要半透明 */
@@ -164,6 +178,75 @@ def init_page_config():
     )
 
 
+def get_cached_df_operation(df, operation, *args, **kwargs):
+    """
+    缓存DataFrame常用操作结果，避免重复计算
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        数据框
+    operation : str
+        操作名称 ('head', 'describe', 'columns_list', 'select_dtypes_numeric', 'select_dtypes_object')
+    *args, **kwargs
+        操作参数
+    
+    Returns:
+    --------
+    操作结果
+    """
+    df_id = id(df)
+    cache_key = f'df_cache_{operation}_{df_id}'
+    
+    # 检查缓存是否存在且有效
+    if cache_key in st.session_state:
+        cached_result = st.session_state[cache_key]
+        cached_df_id = st.session_state.get(f'{cache_key}_df_id')
+        if cached_df_id == df_id:
+            return cached_result
+    
+    # 执行操作并缓存
+    if operation == 'head':
+        result = df.head(*args, **kwargs) if args or kwargs else df.head(50)
+    elif operation == 'describe':
+        result = df.describe()
+    elif operation == 'columns_list':
+        result = df.columns.tolist()
+    elif operation == 'select_dtypes_numeric':
+        result = df.select_dtypes(include=['number']).columns.tolist()
+    elif operation == 'select_dtypes_object':
+        result = df.select_dtypes(include=['object', 'category']).columns.tolist()
+    else:
+        result = None
+    
+    st.session_state[cache_key] = result
+    st.session_state[f'{cache_key}_df_id'] = df_id
+    
+    return result
+
+
+def clear_df_cache(df_id=None):
+    """
+    清除DataFrame缓存
+    
+    Parameters:
+    -----------
+    df_id : int, optional
+        特定DataFrame的ID，如果为None则清除所有缓存
+    """
+    if df_id is None:
+        keys_to_remove = [k for k in st.session_state.keys() if k.startswith('df_cache_')]
+        for key in keys_to_remove:
+            del st.session_state[key]
+    else:
+        keys_to_remove = [k for k in st.session_state.keys() 
+                         if k.startswith(f'df_cache_') and k.endswith(f'_{df_id}')]
+        for key in keys_to_remove:
+            del st.session_state[key]
+            if f'{key}_df_id' in st.session_state:
+                del st.session_state[f'{key}_df_id']
+
+
 def init_session_state():
     """初始化session state"""
     if 'df' not in st.session_state:
@@ -182,4 +265,8 @@ def init_session_state():
         st.session_state.find_optimal_k = False
     if 'viz_options' not in st.session_state:
         st.session_state.viz_options = {}
+    if 'df_metadata' not in st.session_state:
+        st.session_state.df_metadata = None
+    if 'df_metadata_id' not in st.session_state:
+        st.session_state.df_metadata_id = None
 

@@ -12,7 +12,7 @@ import streamlit as st
 
 def recommend_charts(df, column):
     """
-    根据列的数据类型推荐合适的图表类型
+    根据列的数据类型推荐合适的图表类型（带缓存优化）
     
     Parameters:
     -----------
@@ -26,19 +26,33 @@ def recommend_charts(df, column):
     list
         推荐的图表类型列表
     """
+    df_id = id(df)
+    cache_key = f'recommend_charts_{df_id}_{column}'
+    
+    if cache_key in st.session_state:
+        cached_result = st.session_state[cache_key]
+        cached_df_id = st.session_state.get(f'{cache_key}_df_id')
+        if cached_df_id == df_id:
+            return cached_result
+    
     dtype = df[column].dtype
     
     if pd.api.types.is_numeric_dtype(dtype):
         # 数值型：直方图、箱线图、小提琴图、散点图
-        return ['histogram', 'box_plot', 'violin', 'scatter']
+        result = ['histogram', 'box_plot', 'violin', 'scatter']
     elif pd.api.types.is_categorical_dtype(dtype) or dtype == 'object':
         unique_count = df[column].nunique()
         if unique_count <= 10:
-            return ['bar_chart', 'pie_chart', 'count_plot']
+            result = ['bar_chart', 'pie_chart', 'count_plot']
         else:
-            return ['bar_chart', 'word_cloud', 'count_plot']
+            result = ['bar_chart', 'word_cloud', 'count_plot']
     else:
-        return ['line_chart', 'bar_chart', 'scatter']
+        result = ['line_chart', 'bar_chart', 'scatter']
+    
+    st.session_state[cache_key] = result
+    st.session_state[f'{cache_key}_df_id'] = df_id
+    
+    return result
 
 
 def create_violin_plot(df, column, by=None, title=None):

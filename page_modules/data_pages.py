@@ -16,6 +16,7 @@ from visualization import (
     create_violin_plot, create_density_contour,
     create_parallel_coordinates
 )
+from utils import get_plotly_config, get_cached_df_operation, clear_df_cache
 
 
 def show_data_upload():
@@ -65,6 +66,10 @@ def show_data_upload():
                                 st.info("💡 提示：请尝试更改 CSV 分隔符选项。")
                                 st.dataframe(df.head(5), use_container_width=True)
                             else:
+                                if st.session_state.df is not None:
+                                    old_df_id = id(st.session_state.df)
+                                    clear_df_cache(old_df_id)
+                                
                                 st.session_state.df = df
                                 st.session_state.df_cleaned = df.copy()
                                 st.toast("✅ 数据加载成功！", icon="🎉")
@@ -78,8 +83,14 @@ def show_data_upload():
     with col2:
         with st.expander("📋 数据预览", expanded=True):
             if st.session_state.df is not None:
-                st.dataframe(st.session_state.df.head(10), use_container_width=True)
-                st.caption(f"显示前 10 行 / 共 {st.session_state.df.shape[0]} 行")
+                df_preview = get_cached_df_operation(st.session_state.df, 'head', 10)
+                st.dataframe(df_preview, use_container_width=True)
+                df_id = id(st.session_state.df)
+                if st.session_state.get('df_metadata_id') == df_id and st.session_state.get('df_metadata'):
+                    total_rows = st.session_state.df_metadata['shape'][0]
+                else:
+                    total_rows = st.session_state.df.shape[0]
+                st.caption(f"显示前 10 行 / 共 {total_rows} 行")
             else:
                 st.info("暂无数据，请先上传。")
         
@@ -106,15 +117,28 @@ def show_data_overview():
     
     df = st.session_state.df
     
+    df_id = id(df)
+    
+    if ('df_metadata' not in st.session_state or 
+        st.session_state.get('df_metadata_id') != df_id):
+    if ('df_metadata' not in st.session_state or 
+        st.session_state.get('df_metadata_id') != df_id):
+        st.session_state.df_metadata = {
+            'shape': df.shape,
+            'memory_mb': df.memory_usage(deep=True).sum() / 1024**2
+        }
+        st.session_state.df_metadata_id = df_id
+    
+    metadata = st.session_state.df_metadata
+    
     # 关键指标 Dashboard
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("行数 (Samples)", f"{df.shape[0]:,}")
+        st.metric("行数 (Samples)", f"{metadata['shape'][0]:,}")
     with col2:
-        st.metric("列数 (Features)", f"{df.shape[1]}")
+        st.metric("列数 (Features)", f"{metadata['shape'][1]}")
     with col3:
-        memory_mb = df.memory_usage(deep=True).sum() / 1024**2
-        st.metric("内存占用", f"{memory_mb:.2f} MB")
+        st.metric("内存占用", f"{metadata['memory_mb']:.2f} MB")
     with col4:
         if st.session_state.quality_scores:
             score = st.session_state.quality_scores['overall_score']
@@ -126,7 +150,8 @@ def show_data_overview():
     tab1, tab2, tab3 = st.tabs(["数据预览", "列详细信息", "质量报告"])
     
     with tab1:
-        st.dataframe(df.head(50), use_container_width=True)
+        df_head = get_cached_df_operation(df, 'head', 50)
+        st.dataframe(df_head, use_container_width=True)
         
     with tab2:
         if st.session_state.data_overview:
@@ -140,7 +165,8 @@ def show_data_overview():
             st.dataframe(col_info, use_container_width=True, hide_index=True)
             
             st.markdown("##### 数值型变量统计")
-            st.dataframe(df.describe(), use_container_width=True)
+            df_describe = get_cached_df_operation(df, 'describe')
+            st.dataframe(df_describe, use_container_width=True)
 
     with tab3:
         if st.session_state.quality_scores:
@@ -225,7 +251,8 @@ def show_data_cleaning():
         
         with tab1:
             if st.session_state.df_cleaned is not None:
-                st.dataframe(st.session_state.df_cleaned.head(100), use_container_width=True)
+                df_cleaned_head = get_cached_df_operation(st.session_state.df_cleaned, 'head', 100)
+                st.dataframe(df_cleaned_head, use_container_width=True)
             else:
                 st.info("暂无清洗后的数据")
         
@@ -247,6 +274,8 @@ def show_eda():
         st.warning("⚠️ 请先上传数据文件")
         return
     
+    df_columns = get_cached_df_operation(df, 'columns_list')
+    
     col_params, col_chart = st.columns([1, 3], gap="medium")
     
     chart_type_tab = st.tabs(["单变量", "双变量", "多变量", "相关性"])
@@ -254,7 +283,7 @@ def show_eda():
     with chart_type_tab[0]:
         with col_params:
             st.markdown("##### 配置")
-            col_selected = st.selectbox("选择列", df.columns.tolist(), key='eda_1_col')
+            col_selected = st.selectbox("选择列", df_columns, key='eda_1_col')
             if col_selected:
                 recommended = recommend_charts(df, col_selected)
                 chart_mode = st.selectbox("图表类型", recommended, key='eda_1_mode')
@@ -265,36 +294,40 @@ def show_eda():
                 
                 group_col = None
                 if chart_mode == 'violin':
-                    group_col = st.selectbox("分组列 (可选)", [None] + df.columns.tolist(), key='eda_1_group')
+                    group_col = st.selectbox("分组列 (可选)", [None] + df_columns, key='eda_1_group')
 
         with col_chart:
-            if col_selected:
+            if col_selected and chart_mode:
                 try:
                     st.markdown(f"#### {col_selected} - {chart_mode} 分析")
-                    if chart_mode == 'histogram':
-                        fig = create_histogram(df, col_selected, bins=bins)
-                    elif chart_mode == 'box_plot':
-                        fig = create_box_plot(df, col_selected)
-                    elif chart_mode == 'violin':
-                        fig = create_violin_plot(df, col_selected, by=group_col)
-                    elif chart_mode == 'bar_chart':
-                        fig = create_bar_chart(df, col_selected)
-                    else:
-                        fig = None
-                    
-                    if fig:
-                        st.plotly_chart(fig, use_container_width=True)
-                    else:
-                        st.warning("无法生成图表，请检查数据列类型")
+                    # 使用spinner提示用户正在生成图表
+                    with st.spinner("正在生成图表..."):
+                        if chart_mode == 'histogram':
+                            fig = create_histogram(df, col_selected, bins=bins)
+                        elif chart_mode == 'box_plot':
+                            fig = create_box_plot(df, col_selected)
+                        elif chart_mode == 'violin':
+                            fig = create_violin_plot(df, col_selected, by=group_col)
+                        elif chart_mode == 'bar_chart':
+                            fig = create_bar_chart(df, col_selected)
+                        else:
+                            fig = None
+                        
+                        if fig:
+                            st.plotly_chart(fig, use_container_width=True, config=get_plotly_config())
+                        else:
+                            st.warning("无法生成图表，请检查数据列类型")
                 except Exception as e:
                     st.error(f"生成图表时出错: {str(e)}")
+            elif not col_selected:
+                st.info("👈 请先在左侧选择要分析的列")
 
     with chart_type_tab[1]:
         with col_params:
             st.markdown("##### 配置")
-            x_col = st.selectbox("X 轴", df.columns.tolist(), key='eda_2_x')
-            y_col = st.selectbox("Y 轴", df.columns.tolist(), key='eda_2_y')
-            color_col = st.selectbox("颜色分组 (可选)", [None] + df.columns.tolist(), key='eda_2_color')
+            x_col = st.selectbox("X 轴", df_columns, key='eda_2_x')
+            y_col = st.selectbox("Y 轴", df_columns, key='eda_2_y')
+            color_col = st.selectbox("颜色分组 (可选)", [None] + df_columns, key='eda_2_color')
             plot_type_2 = st.radio("展示方式", ["散点图", "密度等高线"], key='eda_2_type')
 
         with col_chart:
@@ -306,7 +339,7 @@ def show_eda():
                     else:
                         fig = create_density_contour(df, x_col, y_col)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width=True, config=get_plotly_config())
                     else:
                         st.warning("无法生成图表，请检查数据列类型")
                 except Exception as e:
@@ -315,7 +348,7 @@ def show_eda():
     with chart_type_tab[2]:
         with col_params:
             st.markdown("##### 配置")
-            numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+            numeric_cols = get_cached_df_operation(df, 'select_dtypes_numeric')
             if len(numeric_cols) >= 2:
                 selected_cols = st.multiselect(
                     "选择列 (2-5个)", 
@@ -337,7 +370,7 @@ def show_eda():
                     else:
                         fig = create_parallel_coordinates(df, columns=selected_cols)
                     if fig:
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width=True, config=get_plotly_config())
                     else:
                         st.warning("无法生成图表，请检查数据")
                 except Exception as e:
@@ -345,9 +378,11 @@ def show_eda():
 
     with chart_type_tab[3]:
         st.markdown("#### 特征相关性热力图")
-        fig = create_correlation_heatmap(df)
-        if fig:
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.warning("需要至少 2 个数值型列")
+        with st.spinner("正在生成相关性热力图..."):
+            fig = create_correlation_heatmap(df)
+            if fig:
+                # 优化：使用优化的图表渲染配置
+                st.plotly_chart(fig, use_container_width=True, config=get_plotly_config())
+            else:
+                st.warning("需要至少 2 个数值型列")
 
